@@ -3,17 +3,17 @@ import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import Notification from './components/Notification'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [notification, setNotification] = useState(null)
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs(blogs)
-    )
+    blogService.getAll().then(blogs => setBlogs(blogs))
   }, [])
 
   useEffect(() => {
@@ -25,22 +25,26 @@ const App = () => {
     }
   }, [])
 
+  const showNotification = (message, duration = 5000) => {
+    setNotification(message)
+    setTimeout(() => {
+      setNotification(null)
+    }, duration)
+  }
+
   const handleLogin = async (event) => {
     event.preventDefault()
     try {
-      const user = await loginService.login({
-        username, password
-      })
+      const user = await loginService.login({ username, password })
 
-      window.localStorage.setItem(
-        'loggedBlogUser', JSON.stringify(user)
-      )
+      window.localStorage.setItem('loggedBlogUser', JSON.stringify(user))
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
       setPassword('')
+      showNotification(`Welcome ${user.name}`)
     } catch (exception) {
-      alert('wrong credentials')
+      showNotification('wrong username or password')
     }
   }
 
@@ -48,14 +52,16 @@ const App = () => {
     setUser(null)
     window.localStorage.removeItem('loggedBlogUser')
     blogService.setToken(null)
+    showNotification('Logged out')
   }
 
   const addBlog = async (blogObject) => {
     try {
       const returnedBlog = await blogService.create(blogObject)
       setBlogs(blogs.concat(returnedBlog))
+      showNotification(`a new blog "${returnedBlog.title}" by ${returnedBlog.author} added`)
     } catch (error) {
-      alert('Blog creation failed')
+      showNotification('Blog creation failed')
     }
   }
 
@@ -63,6 +69,7 @@ const App = () => {
     return (
       <div>
         <h2>Log in to application</h2>
+        <Notification message={notification} />
         <form onSubmit={handleLogin}>
           <div>
             username
@@ -93,6 +100,7 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
+      <Notification message={notification} />
       <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
 
       <h2>create new</h2>
