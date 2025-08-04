@@ -5,24 +5,24 @@ const BlogForm = ({ createBlog }) => {
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
 
-  const addBlog = (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault()
-    createBlog({
-      title,
-      author,
-      url
-    })
+    createBlog({ title, author, url })
+
+    // Tyhjennetään kentät
     setTitle('')
     setAuthor('')
     setUrl('')
   }
 
   return (
-    <form onSubmit={addBlog}>
+    <form onSubmit={handleSubmit}>
       <div>
         title:
         <input
+          type="text"
           value={title}
+          name="Title"
           onChange={({ target }) => setTitle(target.value)}
           required
         />
@@ -30,7 +30,9 @@ const BlogForm = ({ createBlog }) => {
       <div>
         author:
         <input
+          type="text"
           value={author}
+          name="Author"
           onChange={({ target }) => setAuthor(target.value)}
           required
         />
@@ -38,7 +40,9 @@ const BlogForm = ({ createBlog }) => {
       <div>
         url:
         <input
+          type="text"
           value={url}
+          name="Url"
           onChange={({ target }) => setUrl(target.value)}
           required
         />
