@@ -77,3 +77,44 @@ test('shows url, likes, and user when view button is clicked', async () => {
   expect(screen.getByText(/likes/i)).toBeDefined()
   expect(screen.getByText('Test User')).toBeDefined()
 })
+
+test('calls event handler twice when like button is clicked twice', async () => {
+  const blog = {
+    title: 'Test Blog Title',
+    author: 'Test Author',
+    url: 'http://example.com',
+    likes: 5,
+    user: {
+      username: 'testuser',
+      name: 'Test User'
+    }
+  }
+
+  const user = {
+    username: 'testuser'
+  }
+
+  const mockUpdate = vi.fn()
+  const mockRemove = vi.fn()
+
+  render(
+    <Blog
+      blog={blog}
+      updateBlog={mockUpdate}
+      removeBlog={mockRemove}
+      user={user}
+    />
+  )
+
+  const userSetup = userEvent.setup()
+
+  // Avaa ensin "view"-nappi, jotta like-nappi tulee näkyviin
+  const viewButton = screen.getByText('view')
+  await userSetup.click(viewButton)
+
+  const likeButton = screen.getByText('like')
+  await userSetup.click(likeButton)
+  await userSetup.click(likeButton)
+
+  expect(mockUpdate).toHaveBeenCalledTimes(2)
+})

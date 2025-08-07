@@ -1,6 +1,5 @@
 import React from 'react'
 import { useState } from 'react'
-import blogService from '../services/blogs'
 import PropTypes from 'prop-types'
 
 const Blog = ({ blog, updateBlog, user, removeBlog }) => {
@@ -18,16 +17,13 @@ const Blog = ({ blog, updateBlog, user, removeBlog }) => {
     setVisible(!visible)
   }
 
-  const handleLike = async () => {
+  const handleLike = () => {
     const updatedBlog = {
       ...blog,
       likes: blog.likes + 1,
-      user: blog.user.id || blog.user // varmistus riippuen rakenteesta
+      user: blog.user.id || blog.user // säilytetään käyttäjän tiedot
     }
-
-    const returnedBlog = await blogService.update(blog.id, updatedBlog)
-    returnedBlog.user = blog.user // säilytä lisääjän tiedot
-    updateBlog(returnedBlog)
+    updateBlog(updatedBlog)
   }
 
   return (
